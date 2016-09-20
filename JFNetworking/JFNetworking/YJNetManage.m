@@ -22,7 +22,6 @@
     dispatch_once(&onceToken, ^{
         if (!manage) {
             manage = [[YJNetManage alloc] init];
-            [manage checkNetStatus];
         }
     });
     return manage;
@@ -30,16 +29,13 @@
 
 - (void)showHUD:(BOOL)isShowHUD manage:(YJNetManage *)manage{
     if (isShowHUD) {
-        manage.HUD = [[MBProgressHUD alloc] init];
+        self.HUD = [MBProgressHUD showHUDAddedTo:[UIApplication sharedApplication].delegate.window animated:YES];
         manage.HUD.labelText = @"加载中...";
-        [[UIApplication sharedApplication].delegate.window addSubview:manage.HUD];
     }
 }
 
 #pragma mark -- 使用前封装，对请求成功时候作反应，更加简洁
 - (void)GET:(NSString *)URLString paramater:(id)paramater showHUD:(BOOL)isShowHUD success:(success)success {
-    //网络断开无需发送请求
-    if (self.netStatus<1) return;
     [self showHUD:isShowHUD manage:self];
     [self getWithURLString:URLString parameters:paramater success:^(BOOL successCode, NSDictionary *dataDic) {
         if (success) {
@@ -56,8 +52,6 @@
     }];
 }
 - (void)POST:(NSString *)URLString paramater:(id)paramater showHUD:(BOOL)isShowHUD success:(success)success {
-    //网络断开无需发送请求
-    if (self.netStatus<1) return;
     [self showHUD:isShowHUD manage:self];
     [self postWithURLString:URLString parameters:paramater success:^(BOOL successCode, NSDictionary *dataDic) {
         if (success) {
@@ -74,7 +68,7 @@
     }];
 }
 
-//网络监测
+//网络的监听
 - (void)checkNetStatus{
     AFHTTPSessionManager *manager = [[AFHTTPSessionManager alloc] initWithBaseURL:[NSURL URLWithString:@"www.baidu.com"]];
     [manager.reachabilityManager setReachabilityStatusChangeBlock:^(AFNetworkReachabilityStatus status) {
