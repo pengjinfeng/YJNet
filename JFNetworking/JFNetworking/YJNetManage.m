@@ -111,6 +111,7 @@
     }];
     
 }
+#pragma mark -- Post请求的方法
 - (void)postWithURLString:(NSString *)URLString
                parameters:(id)parameters
                   success:(success)success
@@ -120,7 +121,11 @@
     manage.requestSerializer.timeoutInterval = TIMEOUT;
     manage.requestSerializer = [AFJSONRequestSerializer serializer];
     NSString *url = [URLString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
-    [manage POST:url parameters:parameters progress:^(NSProgress * _Nonnull uploadProgress) {
+    [manage POST:url parameters:parameters constructingBodyWithBlock:^(id<AFMultipartFormData>  _Nonnull formData) {
+        
+        
+    } progress:^(NSProgress * _Nonnull uploadProgress) {
+        
     } success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         if (success) {
             success(YES,responseObject);
@@ -130,9 +135,7 @@
             failure(NO,[NSString stringWithFormat:@"错误信息：\n=============================\n%@\n============================\n",error]);
         }
     }];
-
 }
-
 - (void)requestWithURLString:(NSString *)URLString
                   parameters:(id)parameters
                         type:(NetTypes)type
